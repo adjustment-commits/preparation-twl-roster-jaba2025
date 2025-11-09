@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TWL Roster 2025｜adjustment-lab</title>
-<link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#007b9e">
 <style>
 :root {
@@ -91,6 +90,7 @@ font-size:13px;
 color:#666;
 padding:40px 0 60px;
 }
+</style>
 </head>
 <body>
 <header><h1>TWL Roster 2025｜adjustment-lab</h1></header>
@@ -109,6 +109,8 @@ padding:40px 0 60px;
 </div>
 <footer>© 2025 adjustment-lab</footer>
 <script>
+window.addEventListener("error", e => alert("JSエラー: " + e.message));
+
 fetch("/preparation-twl-roster-jaba2025/assets/players.json")
   .then(res => res.json())
   .then(players => {
@@ -119,14 +121,27 @@ fetch("/preparation-twl-roster-jaba2025/assets/players.json")
       "外野手": document.querySelector("#outfielders .roster")
     };
     players.forEach(p => {
-      const div=document.createElement("div");
-      div.className="card";
-      div.innerHTML=`<h3>${p.name}</h3><p>${p.team}</p><p>${p.age}歳／${p.height}cm ${p.weight}kg</p>`;
-      div.addEventListener("click",()=>showModal(p));
-      if(groups[p.position]) groups[p.position].appendChild(div);
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `<h3>${p.name}</h3><p>${p.team}</p><p>${p.age}歳／${p.height}cm ${p.weight}kg</p>`;
+      div.addEventListener("click", () => showModal(p));
+      if (groups[p.position]) groups[p.position].appendChild(div);
     });
   })
-  .catch(err => console.error("JSON読み込みエラー:", err));
+  .catch(err => alert("JSON読み込みエラー: " + err));
+
+const modal = document.getElementById("modal");
+const closeBtn = document.querySelector(".close");
+
+function showModal(p) {
+  document.getElementById("modal-name").textContent = p.name + "（" + p.kana + "）";
+  document.getElementById("modal-team").textContent = `${p.team}｜${p.position}`;
+  document.getElementById("modal-info").textContent = `${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
+  document.getElementById("modal-school").textContent = `${p.highschool}${p.university ? " → " + p.university : ""}`;
+  modal.style.display = "flex";
+}
+closeBtn.onclick = () => (modal.style.display = "none");
+window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 </script>
 </body>
 </html>
