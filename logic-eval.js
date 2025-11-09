@@ -1,5 +1,5 @@
 /* ============================================================
-adjustment-lab｜VO₂max Lite｜統合評価ロジック ver.2025.11-EXT
+adjustment-lab｜preparation-twl-jaba2025｜統合評価ロジック v2025.11
 ============================================================ */
 
 function cooperToVO2max(dist){ return (dist - 504.9) / 44.73; }
