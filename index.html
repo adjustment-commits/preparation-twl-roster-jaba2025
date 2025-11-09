@@ -140,29 +140,24 @@ function showModal(p) {
   const all = [...phys, ...hit, ...pitch];
   const summary = summarizeAdvantages(all);
 
-  trendDiv.innerHTML = `
+   trendDiv.innerHTML = `
     <div class="trends">
-      <p class="badge">統合傾向</p>
-      ${all.map(t => `<p>・${t}</p>`).join("")}
+      <p class="badge">フィジカル傾向</p>${phys.map(x=>`<p>・${x}</p>`).join("")}
+    </div>
+    <div class="trends">
+      <p class="badge">技術傾向</p>${hit.map(x=>`<p>・${x}</p>`).join("")}
+    </div>
+    <div class="trends">
+      <p class="badge">投球傾向</p>${pitch.map(x=>`<p>・${x}</p>`).join("")}
+    </div>
+    <div class="trends">
+      <p class="badge">統合傾向</p>${all.map(t=>`<p>・${t}</p>`).join("")}
       <hr>
       <p><strong>強み：</strong>${summary.positives.join("／")}</p>
       <p><strong>課題：</strong>${summary.negatives.join("／")}</p>
     </div>`;
-}
-    <div class="trends">
-    <p class="badge">フィジカル傾向</p>${phys.map(x=>`<p>・${x}</p>`).join("")}
-  </div>
-  <div class="trends">
-    <p class="badge">技術傾向</p>${hit.map(x=>`<p>・${x}</p>`).join("")}
-  </div>
-  <div class="trends">
-    <p class="badge">投球傾向</p>${pitch.map(x=>`<p>・${x}</p>`).join("")}
-  </div>
-  <div class="trends">
-    <p class="badge">強み</p>${summary.positives.map(x=>`<p>・${x}</p>`).join("")}
-    <p class="badge">課題</p>${summary.negatives.map(x=>`<p>・${x}</p>`).join("")}
-  </div>`;
-  modal.style.display="flex";
+  
+  modal.style.display = "flex";
 }
 </script>
 </body>
