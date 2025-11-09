@@ -105,6 +105,7 @@ padding:40px 0 60px;
     <p id="modal-team"></p>
     <p id="modal-info"></p>
     <p id="modal-school"></p>
+    <canvas id="radarChart" width="300" height="300"></canvas>
     <hr>
     <h4>評価入力</h4>
     <label>10m（s）<input id="s10" type="number" step="0.01"></label><br>
@@ -115,8 +116,12 @@ padding:40px 0 60px;
     <div id="evalResult"></div>
   </div>
 </div>
+
 <footer>© 2025 adjustment-lab</footer>
+
 <script src="./logic-eval.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 fetch("./assets/players.json")
   .then(res => res.json())
@@ -140,6 +145,7 @@ fetch("./assets/players.json")
 const modal = document.getElementById("modal");
 const closeBtn = document.querySelector(".close");
 const evalResult = document.getElementById("evalResult");
+let radarChartInstance = null;
 
 function showModal(p) {
   document.getElementById("modal-name").textContent = p.name + "（" + p.kana + "）";
@@ -160,7 +166,7 @@ document.getElementById("calcBtn").onclick = () => {
   const rsi = parseFloat(document.getElementById("rsi").value);
 
   const result = calcTotalScore({ s10, s30, cmj, rsi });
-  const vo2 = 50; // 仮値、後で自動計算化予定
+  const vo2 = 50; // 仮値
   const profile = getProfileType(vo2, result.totalBatter);
 
   evalResult.innerHTML = `
@@ -168,6 +174,53 @@ document.getElementById("calcBtn").onclick = () => {
     <p style="color:${profile.color};font-weight:bold;">タイプ：${profile.type}</p>
     <p>${profile.desc}</p>
   `;
+
+  const ctx = document.getElementById('radarChart');
+  if (!ctx) return;
+  if (radarChartInstance) radarChartInstance.destroy();
+
+  radarChartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Sprint', 'CMJ', 'RSI', 'Agility', 'Blast', 'Rapsodo'],
+      datasets: [{
+        label: profile.type,
+        data: [
+          result.sprintScore,
+          result.cmjScore,
+          result.rsiScore,
+          result.agilityScore,
+          result.blastScore,
+          result.rapsodoBatterScore
+        ],
+        backgroundColor: `${profile.color}40`,
+        borderColor: profile.color,
+        borderWidth: 2,
+        pointBackgroundColor: profile.color
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 6,
+          ticks: { stepSize: 1, display: false },
+          grid: { color: 'rgba(0,0,0,0.1)' },
+          angleLines: { color: 'rgba(0,0,0,0.1)' },
+          pointLabels: { color: '#333', font: { size: 12 } }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: `${profile.type}｜${profile.desc}`,
+          color: '#333',
+          font: { size: 14 }
+        }
+      }
+    }
+  });
 };
 </script>
 </body>
