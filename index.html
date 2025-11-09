@@ -7,141 +7,113 @@
 <meta name="theme-color" content="#007b9e">
 <style>
 :root {
-  --bg:#f8faf9;
-  --text:#1a1a1a;
-  --accent:#007b9e;
-  --card:#fff;
-  --line:rgba(0,0,0,0.08);
+  --bg:#f8faf9; --text:#1a1a1a; --accent:#007b9e;
   font-family:'Noto Sans JP',sans-serif;
 }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.8;
-  -webkit-font-smoothing:antialiased;
-}
-header {
-  background:var(--accent);
-  color:#fff;
-  text-align:center;
-  padding:16px;
-}
-h1 { margin:0; font-size:20px; }
-section {
-  padding:20px;
-  max-width:1000px;
-  margin:auto;
-}
-h2 {
-  border-left:4px solid var(--accent);
-  padding-left:8px;
-  margin-top:40px;
-}
-.roster {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-.card {
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:10px;
-  width:calc(33.333% - 10px);
-  cursor:pointer;
-  box-shadow:0 1px 3px rgba(0,0,0,0.05);
-  transition:transform 0.15s ease;
-}
-.card:hover { transform:scale(1.03); }
-.card h3 {
-  margin:0;
-  font-size:16px;
-  color:var(--accent);
-}
-.card p { margin:2px 0; font-size:13px; color:#333; }
-@media(max-width:700px){ .card{width:calc(50% - 10px);} }
-@media(max-width:480px){ .card{width:100%;} }
-.modal {
-display:none;
-position:fixed;
-top:0; left:0;
-width:100%; height:100%;
-background:rgba(0,0,0,0.5);
-justify-content:center;
-align-items:center;
-}
-.modal-content {
-background:#fff;
-border-radius:10px;
-padding:20px;
-width:90%;
-max-width:400px;
-}
-.modal-content h3 { color:var(--accent); margin-top:0; }
-.close {
-float:right;
-cursor:pointer;
-color:#999;
-}
-footer {
-text-align:center;
-font-size:13px;
-color:#666;
-padding:40px 0 60px;
-}
+body {margin:0;background:var(--bg);color:var(--text);line-height:1.8;}
+header{background:var(--accent);color:#fff;text-align:center;padding:16px;}
+section{padding:20px;max-width:1000px;margin:auto;}
+h2{border-left:4px solid var(--accent);padding-left:8px;margin-top:40px;}
+input[type=number]{width:80px;padding:4px;margin:4px;}
+button{background:var(--accent);color:#fff;border:none;padding:8px 16px;
+border-radius:6px;cursor:pointer;}
+button:hover{opacity:0.9;}
+.result-box{margin-top:20px;padding:16px;background:#fff;border-radius:8px;
+box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+#type{font-weight:bold;font-size:1.1em;}
 </style>
 </head>
 <body>
-<header><h1>TWL Roster 2025｜adjustment-lab</h1></header>
-<section id="pitchers"><h2>投手</h2><div class="roster"></div></section>
-<section id="catchers"><h2>捕手</h2><div class="roster"></div></section>
-<section id="infielders"><h2>内野手</h2><div class="roster"></div></section>
-<section id="outfielders"><h2>外野手</h2><div class="roster"></div></section>
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <span class="close">✕</span>
-    <h3 id="modal-name"></h3>
-    <p id="modal-team"></p>
-    <p id="modal-info"></p>
-    <p id="modal-school"></p>
-  </div>
+<header><h1>TWL Performance Evaluator｜adjustment-lab</h1></header>
+<section>
+<h2>測定値を入力</h2>
+<p>（任意入力でOK。空欄は自動スキップ）</p>
+<div>
+<h3>VO₂max・スプリント・ジャンプ</h3>
+VO₂max<input id="vo2" type="number">　
+10m<input id="s10" type="number">　
+30m<input id="s30" type="number">　
+60m<input id="s60" type="number"><br>
+CMJ<input id="cmj" type="number">　
+RSI<input id="rsi" type="number">　
+アジリティ<input id="agility" type="number">
 </div>
-<footer>© 2025 adjustment-lab</footer>
+<hr>
+<div>
+<h3>打者データ（BLAST・Rapsodo）</h3>
+BatSpeed<input id="batSpeed" type="number">　
+AttackAngle<input id="attackAngle" type="number">　
+TimeToContact<input id="timeToContact" type="number"><br>
+ExitVelo<input id="exitVelo" type="number">　
+LaunchAngle<input id="launchAngle" type="number">　
+Consistency<input id="batterConsistency" type="number">
+</div>
+<hr>
+<div>
+<h3>投手データ（Rapsodo）</h3>
+球速<input id="velo" type="number">　
+SpinEff<input id="spinEff" type="number">　
+Extension<input id="extension" type="number">　
+Consistency<input id="pitcherConsistency" type="number">
+</div>
+<hr>
+<button onclick="analyze()">解析する</button>
+<div id="output" class="result-box" style="display:none;">
+  <p id="type"></p>
+  <p id="desc"></p>
+  <p><b>合計スコア：</b><span id="score"></span></p>
+</div>
+</section>
 <script>
-window.addEventListener("error", e => alert("JSエラー: " + e.message));
+// === 各評価関数群（adjustment-lab ver.2025.11-EXT） ===
+function cooperToVO2max(dist){return(dist-504.9)/44.73;}
+function yoyoToVO2max(dist){return dist*0.0084+36.4;}
+function calcSprintScore(s10,s30,s60){let s=0;if(!isNaN(s10)){if(s10<=1.45)s+=2;else if(s10<=1.50)s+=1;}
+if(!isNaN(s30)){if(s30<=3.75)s+=2;else if(s30<=3.85)s+=1;}
+if(!isNaN(s60)){if(s60<=7.00)s+=2;else if(s60<=7.20)s+=1;}return s;}
+function calcCMJScore(cmj){if(isNaN(cmj))return 0;if(cmj>=70)return 2;if(cmj>=65)return 1;return 0;}
+function calcRSIScore(rsi){if(isNaN(rsi))return 0;if(rsi>=3.0)return 2;if(rsi>=2.5)return 1;return 0;}
+function calcAgilityScore(a){if(isNaN(a))return 0;if(a<=4.20)return 2;if(a<=4.40)return 1;return 0;}
+function calcBlastScore(bs,aa,ttc){let s=0;if(!isNaN(bs)){if(bs>=75)s+=2;else if(bs>=70)s+=1;}
+if(!isNaN(aa)){if(aa>=10&&aa<=20)s+=1;}if(!isNaN(ttc)){if(ttc>=0.14&&ttc<=0.16)s+=1;}return s;}
+function calcRapsodoBatterScore(ev,la,c){let s=0;if(!isNaN(ev)){if(ev>=160)s+=2;else if(ev>=150)s+=1;}
+if(!isNaN(la)){if(la>=12&&la<=18)s+=1;else if(la>=10&&la<=20)s+=0.5;}
+if(!isNaN(c)){if(c<=3)s+=1;else if(c<=5)s+=0.5;}return s;}
+function calcRapsodoPitcherScore(v,sp,ex,c){let s=0;if(!isNaN(v)){if(v>=145)s+=2;else if(v>=140)s+=1;}
+if(!isNaN(sp)){if(sp>=85&&sp<=95)s+=1;}
+if(!isNaN(ex)){if(ex>=180)s+=1;else if(ex>=170)s+=0.5;}
+if(!isNaN(c)){if(c<=3)s+=1;else if(c<=5)s+=0.5;}return s;}
+function calcTotalScore(d){
+const sprint=calcSprintScore(d.s10,d.s30,d.s60);
+const cmj=calcCMJScore(d.cmj);
+const rsi=calcRSIScore(d.rsi);
+const ag=calcAgilityScore(d.agility);
+const blast=calcBlastScore(d.batSpeed,d.attackAngle,d.timeToContact);
+const batR=calcRapsodoBatterScore(d.exitVelo,d.launchAngle,d.batterConsistency);
+const pitR=calcRapsodoPitcherScore(d.velo,d.spinEff,d.extension,d.pitcherConsistency);
+return {totalBatter:sprint+cmj+rsi+ag+blast+batR,totalPitcher:sprint+cmj+rsi+ag+pitR};}
+function getProfileType(vo2,score){
+if(vo2>=49&&score>=16)return{type:"完全統合型（Total Performer）",color:"gold",desc:"出力・反応・再現性すべてが高水準。全国上位〜プロ水準。"};
+if(vo2<49&&score>=16)return{type:"出力優位型（Explosive Specialist）",color:"green",desc:"出力と反応は抜群だが再現性に課題。短期決戦型。"};
+if(vo2>=49&&score>=10)return{type:"安定発揮型（Enduring Competitor）",color:"blue",desc:"再現性に優れ、安定したパフォーマンスを維持できるタイプ。"};
+if(vo2<49&&score>=10)return{type:"瞬発主導型（Power-Dominant）",color:"orange",desc:"爆発的出力は高いが安定性に波がある。"};
+return{type:"基盤形成期（Foundation Stage）",color:"gray",desc:"出力・再現力とも発展段階。呼吸・基礎持久の育成を優先。"};}
 
-fetch("/preparation-twl-roster-jaba2025/assets/players.json")
-  .then(res => res.json())
-  .then(players => {
-    const groups = {
-      "投手": document.querySelector("#pitchers .roster"),
-      "捕手": document.querySelector("#catchers .roster"),
-      "内野手": document.querySelector("#infielders .roster"),
-      "外野手": document.querySelector("#outfielders .roster")
-    };
-    players.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `<h3>${p.name}</h3><p>${p.team}</p><p>${p.age}歳／${p.height}cm ${p.weight}kg</p>`;
-      div.addEventListener("click", () => showModal(p));
-      if (groups[p.position]) groups[p.position].appendChild(div);
-    });
-  })
-  .catch(err => alert("JSON読み込みエラー: " + err));
-
-const modal = document.getElementById("modal");
-const closeBtn = document.querySelector(".close");
-
-function showModal(p) {
-  document.getElementById("modal-name").textContent = p.name + "（" + p.kana + "）";
-  document.getElementById("modal-team").textContent = `${p.team}｜${p.position}`;
-  document.getElementById("modal-info").textContent = `${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
-  document.getElementById("modal-school").textContent = `${p.highschool}${p.university ? " → " + p.university : ""}`;
-  modal.style.display = "flex";
+// === メイン解析処理 ===
+function analyze(){
+  const d={s10:+s10.value,s30:+s30.value,s60:+s60.value,cmj:+cmj.value,rsi:+rsi.value,agility:+agility.value,
+    batSpeed:+batSpeed.value,attackAngle:+attackAngle.value,timeToContact:+timeToContact.value,
+    exitVelo:+exitVelo.value,launchAngle:+launchAngle.value,batterConsistency:+batterConsistency.value,
+    velo:+velo.value,spinEff:+spinEff.value,extension:+extension.value,pitcherConsistency:+pitcherConsistency.value};
+  const vo2=+vo2.value||0;
+  const t=calcTotalScore(d);
+  const profile=getProfileType(vo2,Math.max(t.totalBatter,t.totalPitcher));
+  output.style.display="block";
+  type.innerHTML=`<span style="color:${profile.color}">${profile.type}</span>`;
+  desc.textContent=profile.desc;
+  score.textContent=`野手 ${t.totalBatter.toFixed(1)}点 ／ 投手 ${t.totalPitcher.toFixed(1)}点`;
 }
-closeBtn.onclick = () => (modal.style.display = "none");
-window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 </script>
 </body>
 </html>
+
