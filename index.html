@@ -7,91 +7,40 @@
 <meta name="theme-color" content="#007b9e">
 <style>
 :root {
-  --bg:#f8faf9;
-  --text:#1a1a1a;
-  --accent:#007b9e;
-  --card:#fff;
+  --bg:#f8faf9; --text:#1a1a1a; --accent:#007b9e; --card:#fff;
   --line:rgba(0,0,0,0.08);
   font-family:'Noto Sans JP',sans-serif;
 }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.8;
-  -webkit-font-smoothing:antialiased;
-}
-header {
-  background:var(--accent);
-  color:#fff;
-  text-align:center;
-  padding:16px;
-}
+body { margin:0; background:var(--bg); color:var(--text); line-height:1.8; }
+header { background:var(--accent); color:#fff; text-align:center; padding:16px; }
 h1 { margin:0; font-size:20px; }
-section {
-  padding:20px;
-  max-width:1000px;
-  margin:auto;
-}
-h2 {
-  border-left:4px solid var(--accent);
-  padding-left:8px;
-  margin-top:40px;
-}
-.roster {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-.card {
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:10px;
-  width:calc(33.333% - 10px);
-  cursor:pointer;
-  box-shadow:0 1px 3px rgba(0,0,0,0.05);
-  transition:transform 0.15s ease;
-}
+section { padding:20px; max-width:1000px; margin:auto; }
+h2 { border-left:4px solid var(--accent); padding-left:8px; margin-top:40px; }
+.roster { display:flex; flex-wrap:wrap; gap:10px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px;
+  padding:10px; width:calc(33.333% - 10px); cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05); transition:transform 0.15s ease; }
 .card:hover { transform:scale(1.03); }
-.card h3 {
-  margin:0;
-  font-size:16px;
-  color:var(--accent);
-}
+.card h3 { margin:0; font-size:16px; color:var(--accent); }
 .card p { margin:2px 0; font-size:13px; color:#333; }
 @media(max-width:700px){ .card{width:calc(50% - 10px);} }
 @media(max-width:480px){ .card{width:100%;} }
 .modal {
-display:none;
-position:fixed;
-top:0; left:0;
-width:100%; height:100%;
-background:rgba(0,0,0,0.5);
-justify-content:center;
-align-items:center;
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.5); justify-content:center; align-items:center;
 }
 .modal-content {
-  background:#fff;
-  border-radius:10px;
-  padding:20px;
-  width:90%;
-  max-width:400px;
-  max-height:90vh;
-  overflow-y:auto;
+  background:#fff; border-radius:10px; padding:20px;
+  width:90%; max-width:420px; max-height:90vh; overflow-y:auto;
 }
 .modal-content h3 { color:var(--accent); margin-top:0; }
-.close {
-float:right;
-cursor:pointer;
-color:#999;
-}
-footer {
-text-align:center;
-font-size:13px;
-color:#666;
-padding:40px 0 60px;
-}
+.close { float:right; cursor:pointer; color:#999; }
+footer { text-align:center; font-size:13px; color:#666; padding:40px 0 60px; }
+.trends { background:#f7fbfd; border:1px solid rgba(0,0,0,0.06); padding:10px; border-radius:8px; }
+.trends p { margin:6px 0; }
+.badge { display:inline-block; padding:2px 6px; border-radius:6px; font-size:11px;
+  margin-right:6px; background:#eef7ff; border:1px solid #cfe7ff; }
+.note { font-size:12px; color:#666; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -108,9 +57,17 @@ padding:40px 0 60px;
     <p id="modal-info"></p>
     <p id="modal-school"></p>
     <canvas id="radarChart" width="300" height="300"></canvas>
-
-    <hr>
-    <h4>評価入力</h4>
+<hr>
+<h4>RPE／体調ログ</h4>
+<label>日付<input id="logDate" type="date"></label><br>
+<label>RPE<input id="logRpe" type="number" min="1" max="10"></label><br>
+<label>疲労（1〜5）<input id="logFatigue" type="number" min="1" max="5"></label><br>
+<label>睡眠（h）<input id="logSleep" type="number" step="0.5" min="0" max="12"></label><br>
+<label>痛み（0〜10）<input id="logPain" type="number" min="0" max="10"></label><br>
+<button id="saveLogBtn">記録を保存</button>
+<canvas id="rpeChart" width="300" height="180"></canvas>
+<hr>
+<h4>評価入力（フィジカル）</h4>
 <label>10m（s）<input id="s10" type="number" step="0.01"></label><br>
 <label>30m（s）<input id="s30" type="number" step="0.01"></label><br>
 <label>60m（s）<input id="s60" type="number" step="0.01"></label><br>
@@ -118,348 +75,27 @@ padding:40px 0 60px;
 <label>CMJ（cm）<input id="cmj" type="number"></label><br>
 <label>RSI<input id="rsi" type="number" step="0.01"></label><br>
 <hr>
-<h4>BLAST（打者用）</h4>
-<label>Bat Speed（km/h）<input id="batSpeed" type="number"></label><br>
-<label>Attack Angle（°）<input id="attackAngle" type="number"></label><br>
-<label>Time to Contact（s）<input id="timeToContact" type="number" step="0.01"></label><br>
+<h4 class="sec-blast">BLAST（野手）</h4>
+<label>スイング速度（km/h）<input id="swingSpeed" type="number"></label><br>
+<label>アタックアングル（°）<input id="attackAngle" type="number"></label><br>
+<label>スイングタイム（s）<input id="swingTime" type="number" step="0.01"></label><br>
 <hr>
-<h4>Rapsodo（投手/打者）</h4>
-<label>Exit Velo（打球初速）<input id="exitVelo" type="number"></label><br>
-<label>Launch Angle（°）<input id="launchAngle" type="number"></label><br>
-<label>Consistency（ばらつき）<input id="batterConsistency" type="number" step="0.1"></label><br>
-<label>Velo（球速 km/h）<input id="velo" type="number"></label><br>
-<label>Spin Eff（%）<input id="spinEff" type="number"></label><br>
-<label>Extension（cm）<input id="extension" type="number"></label><br>
-<label>Consistency（投手）<input id="pitcherConsistency" type="number" step="0.1"></label><br>
- <button id="calcBtn">評価を算出</button>
-    <div id="evalResult"></div>
-    <button id="deleteEvalBtn" style="background:#ff4d4d;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;margin-top:6px;">
-評価データを削除
-</button>
-
-    <hr>
-    <h4>RPE／体調ログ</h4>
-    <label>日付<input id="logDate" type="date"></label><br>
-    <label>RPE<input id="logRpe" type="number" min="1" max="10"></label><br>
-    <label>疲労（1〜5）<input id="logFatigue" type="number" min="1" max="5"></label><br>
-    <label>睡眠（h）<input id="logSleep" type="number" step="0.5" min="0" max="12"></label><br>
-    <label>痛み（0〜10）<input id="logPain" type="number" min="0" max="10"></label><br>
-    <button id="saveLogBtn">記録を保存</button>
-    <canvas id="rpeChart" width="300" height="180"></canvas>
-</div>
-
+<h4 class="sec-rap-batter">Rapsodo（野手）</h4>
+<label>打球速度（km/h）<input id="exitVeloB" type="number"></label><br>
+<label>推定飛距離（m）<input id="estDistance" type="number"></label><br>
+<label>打球角度（°）<input id="launchAngleB" type="number"></label><br>
+<hr>
+<h4 class="sec-rap-pitcher">Rapsodo（投手）</h4>
+<label>球速（km/h）<input id="velo" type="number"></label><br>
+<label>回転数（rpm）<input id="spinRate" type="number"></label><br>
+<label>縦変化（cm）<input id="vertBreak" type="number"></label><br>
+<label>横変化（cm）<input id="horizBreak" type="number"></label><br>
+<label>リリース角度（°）<input id="releaseAngle" type="number"></label><br>
+<div id="evalResult"></div>
+<button id="deleteEvalBtn" style="background:#ff4d4d;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;margin-top:6px;">評価データを削除</button>
+</div></div>
 <footer>© 2025 adjustment-lab</footer>
-
 <script src="./logic-eval.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-fetch("./assets/players.json")
-  .then(res => res.json())
-  .then(players => {
-    const groups = {
-      "投手": document.querySelector("#pitchers .roster"),
-      "捕手": document.querySelector("#catchers .roster"),
-      "内野手": document.querySelector("#infielders .roster"),
-      "外野手": document.querySelector("#outfielders .roster")
-    };
-    players.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `<h3>${p.name}</h3><p>${p.team}</p><p>${p.age}歳／${p.height}cm ${p.weight}kg</p>`;
-      div.addEventListener("click", () => showModal(p));
-      if (groups[p.position]) groups[p.position].appendChild(div);
-    });
-  })
-  .catch(err => console.error("JSON読み込みエラー:", err));
-
-const modal = document.getElementById("modal");
-const closeBtn = document.querySelector(".close");
-const evalResult = document.getElementById("evalResult");
-let radarChartInstance = null;
-
-function showModal(p) {
-  document.getElementById("modal-name").textContent = p.name + "（" + p.kana + "）";
-  document.getElementById("modal-team").textContent = `${p.team}｜${p.position}`;
-  document.getElementById("modal-info").textContent = `${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
-  document.getElementById("modal-school").textContent = `${p.highschool}${p.university ? " → " + p.university : ""}`;
-  modal.style.display = "flex";
-
- const blastSection = Array.from(document.querySelectorAll('h4'))
-  .find(h => h.textContent.includes('BLAST'))?.parentElement;
-const rapsodoSection = Array.from(document.querySelectorAll('h4'))
-  .find(h => h.textContent.includes('Rapsodo'))?.parentElement;
-
-if (p.position === "投手") {
-  if (blastSection) blastSection.style.display = "none";
-  if (rapsodoSection) rapsodoSection.style.display = "block";
-} else {
-  if (blastSection) blastSection.style.display = "block";
-  if (rapsodoSection) rapsodoSection.style.display = "none";
-}
-  evalResult.textContent = "";
-}
-
-closeBtn.onclick = () => (modal.style.display = "none");
-window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
-
-document.getElementById("calcBtn").onclick = () => {
-  const s10 = parseFloat(document.getElementById("s10").value);
-  const s30 = parseFloat(document.getElementById("s30").value);
-  const s60 = parseFloat(document.getElementById("s60").value);
-  const agility = parseFloat(document.getElementById("agility").value);
-  const cmj = parseFloat(document.getElementById("cmj").value);
-  const rsi = parseFloat(document.getElementById("rsi").value);
-  const batSpeed = parseFloat(document.getElementById("batSpeed").value);
-  const attackAngle = parseFloat(document.getElementById("attackAngle").value);
-  const timeToContact = parseFloat(document.getElementById("timeToContact").value);
-  const exitVelo = parseFloat(document.getElementById("exitVelo").value);
-  const launchAngle = parseFloat(document.getElementById("launchAngle").value);
-  const batterConsistency = parseFloat(document.getElementById("batterConsistency").value);
-  const velo = parseFloat(document.getElementById("velo").value);
-  const spinEff = parseFloat(document.getElementById("spinEff").value);
-  const extension = parseFloat(document.getElementById("extension").value);
-  const pitcherConsistency = parseFloat(document.getElementById("pitcherConsistency").value);
-
-const result = calcTotalScore({
-  s10, s30, s60, cmj, rsi, agility,
-  batSpeed, attackAngle, timeToContact,
-  exitVelo, launchAngle, batterConsistency,
-  velo, spinEff, extension, pitcherConsistency
-});
-
-  const vo2 = 50; // 仮値
-  const profile = getProfileType(vo2, result.totalBatter);
-
-  evalResult.innerHTML = `
-    <p>総合スコア：${result.totalBatter.toFixed(1)}</p>
-    <p style="color:${profile.color};font-weight:bold;">タイプ：${profile.type}</p>
-    <p>${profile.desc}</p>
-  `;
-  
-  // === 入力値をlocalStorageに保存 ===
-localStorage.setItem("lastInput_" + currentPlayerName, JSON.stringify({
-  s10, s30, s60, agility, cmj, rsi,
-  batSpeed, attackAngle, timeToContact,
-  exitVelo, launchAngle, batterConsistency,
-  velo, spinEff, extension, pitcherConsistency
-}));
-
-  const ctx = document.getElementById('radarChart');
-  if (!ctx) return;
-  if (radarChartInstance) radarChartInstance.destroy();
-
- radarChartInstance = new Chart(ctx, {
-  type: 'radar',
-  data: {
-    labels: ['Sprint', 'CMJ', 'RSI', 'Agility'],
-    datasets: [{
-      label: profile.type,
-      data: [
-        result.sprintScore,
-        result.cmjScore,
-        result.rsiScore,
-        result.agilityScore
-      ],
-      backgroundColor: `${profile.color}40`,
-      borderColor: profile.color,
-      borderWidth: 2,
-      pointBackgroundColor: profile.color
-    }]
-  },
-  options: {
-    scales: {
-      r: {
-        beginAtZero: true,
-        max: 3,
-        ticks: { stepSize: 1, display: false },
-        grid: { color: 'rgba(0,0,0,0.1)' },
-        angleLines: { color: 'rgba(0,0,0,0.1)' },
-        pointLabels: { color: '#333', font: { size: 12 } }
-      }
-    },
-    plugins: {
-      legend: { display: false },
-      title: {
-        display: true,
-        text: `${profile.type}｜${profile.desc}`,
-        color: '#333',
-        font: { size: 14 }
-      }
-    }
-  }
-});
-  backgroundColor: `${profile.color}40`,
-        borderColor: profile.color,
-        borderWidth: 2,
-        pointBackgroundColor: profile.color
-      }]
-    },
-    options: {
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 3,
-          ticks: { stepSize: 1, display: false },
-          grid: { color: 'rgba(0,0,0,0.1)' },
-          angleLines: { color: 'rgba(0,0,0,0.1)' },
-          pointLabels: { color: '#333', font: { size: 12 } }
-        }
-      },
-      plugins: {
-        legend: { display: false },
-        title: {
-          display: true,
-          text: `${profile.type}｜${profile.desc}`,
-          color: '#333',
-          font: { size: 14 }
-        }
-      }
-    }
-  });
-};
-
-let rpeChartInstance = null;
-let currentPlayerName = "";
-
-// === 評価データ削除 ===
-document.getElementById("deleteEvalBtn").onclick = () => {
-  if (!currentPlayerName) return alert("選手が選択されていません。");
-  const confirmDelete = confirm(`${currentPlayerName} の評価データを削除しますか？（RPEログは保持されます）`);
-  if (!confirmDelete) return;
-
-  // 評価データのみ削除
-  localStorage.removeItem("lastInput_" + currentPlayerName);
-
-  // 入力欄と結果をリセット
-  document.querySelectorAll(".modal-content input").forEach(i => {
-    if (i.id && !i.id.startsWith("log")) i.value = "";
-  });
-  evalResult.textContent = "";
-
-  // レーダーチャートを初期化
-  if (radarChartInstance) radarChartInstance.destroy();
-  const ctx = document.getElementById("radarChart");
-  radarChartInstance = new Chart(ctx, {
-    type: "radar",
-    data: {
-      labels: ["Sprint", "CMJ", "RSI", "Agility"],
-      datasets: [{
-        label: "No Data",
-        data: [0, 0, 0, 0],
-        borderColor: "#ccc",
-        borderWidth: 1,
-        pointBackgroundColor: "#ccc"
-      }]
-    },
-    options: {
-      scales: { r: { beginAtZero: true, max: 3, ticks: { stepSize: 1, display: false } } },
-      plugins: { legend: { display: false } }
-    }
-  });
-
-  alert("評価データを削除しました。");
-};  
-  
-function saveRPELog(playerName) {
-  const date = document.getElementById("logDate").value;
-  if (!date) return alert("日付を入力してください。");
-
-  const entry = {
-    date,
-    rpe: Number(document.getElementById("logRpe").value),
-    fatigue: Number(document.getElementById("logFatigue").value),
-    sleep: Number(document.getElementById("logSleep").value),
-    pain: Number(document.getElementById("logPain").value)
-  };
-
-  const key = "RPE_" + playerName;
-  const data = JSON.parse(localStorage.getItem(key) || "[]");
-  const idx = data.findIndex(e => e.date === date);
-  if (idx >= 0) data[idx] = entry; else data.push(entry);
-  localStorage.setItem(key, JSON.stringify(data));
-
-  renderRPEChart(playerName);
-}
-
-function renderRPEChart(playerName) {
-  const key = "RPE_" + playerName;
-  const data = JSON.parse(localStorage.getItem(key) || "[]");
-  const recent = data.slice(-7);
-
-  const labels = recent.map(e => e.date);
-  const rpe = recent.map(e => e.rpe);
-  const fatigue = recent.map(e => e.fatigue);
-  const sleep = recent.map(e => e.sleep);
-
-  const ctx = document.getElementById("rpeChart");
-  if (rpeChartInstance) rpeChartInstance.destroy();
-
-  rpeChartInstance = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        { label: "RPE", data: rpe, borderColor: "#007b9e" },
-        { label: "疲労", data: fatigue, borderColor: "#ff6600" },
-        { label: "睡眠", data: sleep, borderColor: "#00b386" }
-      ]
-    },
-    options: {
-      scales: { y: { beginAtZero: true } },
-      plugins: { legend: { display: true } }
-    }
-  });
-}
-
-function showModal(p) {
-  // 基本情報の表示
-  document.getElementById("modal-name").textContent = p.name + "（" + p.kana + "）";
-  document.getElementById("modal-team").textContent = `${p.team}｜${p.position}`;
-  document.getElementById("modal-info").textContent = `${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
-  document.getElementById("modal-school").textContent = `${p.highschool}${p.university ? " → " + p.university : ""}`;
-  modal.style.display = "flex";
-
-  // === 前回入力値を復元 ===
-const last = JSON.parse(localStorage.getItem("lastInput_" + p.name) || "{}");
-for (const key in last) {
-  const el = document.getElementById(key);
-  if (el) el.value = last[key];
-}
-
-// === 現在の選手名を記録 ===
-currentPlayerName = p.name;
-  
-  evalResult.textContent = "";
-
-  // RPEチャートの初期化
-  renderRPEChart(p.name);
-
-  // 保存ボタン設定
-  const saveBtn = document.getElementById("saveLogBtn");
-  saveBtn.onclick = () => saveRPELog(p.name);
-
-  // レーダーチャートも初期化（空データをリセット）
-  const ctx = document.getElementById("radarChart");
-  if (radarChartInstance) radarChartInstance.destroy();
-  radarChartInstance = new Chart(ctx, {
-    type: "radar",
-    data: {
-      labels: ["Sprint", "CMJ", "RSI", "Agility"],
-      datasets: [{
-        label: "No Data",
-        data: [0, 0, 0, 0,],
-        borderColor: "#ccc",
-        borderWidth: 1,
-        pointBackgroundColor: "#ccc"
-      }]
-    },
-    options: {
-      scales: { r: { beginAtZero: true, max: 6, ticks: { stepSize: 1, display: false } } },
-      plugins: { legend: { display: false } }
-    }
-  });
-}
-</script>
 </body>
 </html>
