@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TWL Roster 2025｜adjustment-lab</title>
 <meta name="theme-color" content="#007b9e">
+<!-- ✅ PWA設定 -->
+<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root {
   --bg:#f8faf9;
@@ -489,6 +493,16 @@ function analyze(p,mode){
   <div class="trends"><p class="badge">統合傾向</p>${all.map(x=>`<p>・${x}</p>`).join("")}
   <hr><p><strong>強み：</strong>${summary.positives.join("／")}</p>
   <p><strong>課題：</strong>${summary.negatives.join("／")}</p></div>`;
+}
+</script>
+<!-- ✅ Service Worker 登録 -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('✅ ServiceWorker登録成功', reg))
+      .catch(err => console.log('❌ ServiceWorker登録失敗', err));
+  });
 }
 </script>
 </body>
