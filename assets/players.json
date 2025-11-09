@@ -1,1 +1,37 @@
+[
+  {"position":"投手","name":"秋山 凌祐","kana":"アキヤマ リョウスケ","age":24,"team":"三菱自動車岡崎","throws":"右","bats":"左","height":175,"weight":81,"highschool":"愛工大名電","university":"立命館"},
+  {"position":"投手","name":"伊東 佳希","kana":"イトウ ヨシキ","age":24,"team":"東京ガス","throws":"右","bats":"右","height":173,"weight":82,"highschool":"旭川北","university":"星槎道都"},
+  {"position":"投手","name":"梅田 健太郎","kana":"ウメダ ケンタロウ","age":23,"team":"ヤマハ","throws":"右","bats":"左","height":181,"weight":90,"highschool":"横浜隼人","university":"立正"},
+  {"position":"投手","name":"柿本 晟弥","kana":"カキモト セイヤ","age":23,"team":"パナソニック","throws":"右","bats":"右","height":183,"weight":80,"highschool":"東洋大姫路","university":"東洋"},
+  {"position":"投手","name":"川合 慎磨","kana":"カワイ シンマ","age":23,"team":"JR四国","throws":"右","bats":"右","height":172,"weight":70,"highschool":"高砂南","university":"神戸学院"},
+  {"position":"投手","name":"川原 嗣貴","kana":"カワハラ シキ","age":21,"team":"Honda鈴鹿","throws":"右","bats":"左","height":189,"weight":96,"highschool":"大阪桐蔭","university":""},
+  {"position":"投手","name":"樋口 新","kana":"ヒグチ シン","age":23,"team":"王子","throws":"左","bats":"左","height":178,"weight":84,"highschool":"千葉経済大附属","university":"愛知工業"},
+  {"position":"投手","name":"本間 悠貴","kana":"ホンマ ユウキ","age":24,"team":"大阪ガス","throws":"左","bats":"左","height":174,"weight":77,"highschool":"大冠","university":"天理"},
+  {"position":"投手","name":"中岡 大河","kana":"ナカオカ タイガ","age":23,"team":"JR西日本","throws":"右","bats":"右","height":177,"weight":74,"highschool":"広島商業","university":"富士"},
+  {"position":"投手","name":"中島 隼也","kana":"ナカジマ シュンヤ","age":27,"team":"鷺宮製作所","throws":"右","bats":"右","height":180,"weight":81,"highschool":"仙台育英","university":"城西国際"},
+  {"position":"投手","name":"長野 健大","kana":"ナガノ ケント","age":23,"team":"JFE西日本","throws":"右","bats":"右","height":184,"weight":86,"highschool":"松商学園","university":"天理"},
+  {"position":"投手","name":"生井 惇己","kana":"ナマイ ジュンキ","age":25,"team":"日立製作所","throws":"左","bats":"左","height":178,"weight":78,"highschool":"慶應義塾","university":"慶應義塾"},
+  {"position":"投手","name":"髙木 寛斗","kana":"タカギ ヒロト","age":23,"team":"日本生命","throws":"左","bats":"左","height":181,"weight":85,"highschool":"福井工大福井","university":"同志社"}
 
+  {"position":"捕手","name":"有馬 諒","kana":"アリマ リョウ","age":24,"team":"ENEOS","throws":"右","bats":"右","height":181,"weight":88,"highschool":"近江","university":"関西"},
+  {"position":"捕手","name":"印出 太一","kana":"インデ タイチ","age":23,"team":"三菱重工EAST","throws":"右","bats":"右","height":185,"weight":90,"highschool":"中京大中京","university":"早稲田"},
+  {"position":"捕手","name":"小鷹 葵","kana":"コタカ アオイ","age":25,"team":"JR東日本東北","throws":"右","bats":"左","height":175,"weight":88,"highschool":"中越","university":"青山学院"},
+  {"position":"捕手","name":"萩原 義輝","kana":"ハギハラ ヨシアキ","age":24,"team":"東芝","throws":"右","bats":"左","height":180,"weight":85,"highschool":"東海大相模","university":"流通経済"},
+  {"position":"捕手","name":"松山 翔太","kana":"マツヤマ ショウタ","age":25,"team":"西部ガス","throws":"右","bats":"右","height":182,"weight":85,"highschool":"鵬翔","university":"宮崎産業経営"}
+
+  {"position":"内野手","name":"相羽 寛太","kana":"アイバ カンタ","age":23,"team":"ヤマハ","throws":"右","bats":"右","height":178,"weight":76,"highschool":"静岡","university":""},
+  {"position":"内野手","name":"石川 楓雅","kana":"イシカワ フウガ","age":23,"team":"JR北海道硬式野球クラブ","throws":"右","bats":"右","height":178,"weight":76,"highschool":"駒大苫小牧","university":"大阪体育"},
+  {"position":"内野手","name":"海﨑 雄太","kana":"カイザキ ユウタ","age":24,"team":"JR東日本","throws":"右","bats":"左","height":178,"weight":81,"highschool":"埼玉栄","university":"法政"},
+  {"position":"内野手","name":"下山 悠介","kana":"シモヤマ ユウスケ","age":25,"team":"東芝","throws":"右","bats":"左","height":176,"weight":82,"highschool":"慶應義塾","university":"慶應義塾"},
+  {"position":"内野手","name":"仲俣 慎之輔","kana":"ナカマタ シンノスケ","age":23,"team":"東京ガス","throws":"右","bats":"右","height":175,"weight":80,"highschool":"岩倉","university":"中央学院"},
+  {"position":"内野手","name":"三野原 愛望","kana":"ミノハラ ヨシノ","age":26,"team":"KMGホールディングス","throws":"右","bats":"左","height":182,"weight":84,"highschool":"東福岡","university":"日本体育"},
+  {"position":"内野手","name":"元山 晶斗","kana":"モトヤマ アキト","age":23,"team":"四国銀行","throws":"右","bats":"左","height":177,"weight":83,"highschool":"高知商業","university":"大阪経済"},
+  {"position":"内野手","name":"山田 健太","kana":"ヤマダ ケンタ","age":25,"team":"日本生命","throws":"右","bats":"右","height":183,"weight":87,"highschool":"大阪桐蔭","university":"立教"}
+
+  {"position":"外野手","name":"石飛 智洋","kana":"イシトビ トモヒロ","age":22,"team":"日産自動車","throws":"右","bats":"左","height":177,"weight":82,"highschool":"出雲西","university":"天理"},
+  {"position":"外野手","name":"大森 廉也","kana":"オオモリ レンヤ","age":23,"team":"JFE東日本","throws":"左","bats":"左","height":183,"weight":80,"highschool":"市立船橋","university":"駒澤"},
+  {"position":"外野手","name":"柴崎 聖人","kana":"シバサキ マサト","age":23,"team":"王子","throws":"右","bats":"左","height":173,"weight":85,"highschool":"岐阜第一","university":"大阪経済"},
+  {"position":"外野手","name":"藤澤 涼介","kana":"フジサワ リョウスケ","age":23,"team":"東京ガス","throws":"右","bats":"右","height":187,"weight":87,"highschool":"佐野日大","university":"横浜国立"},
+  {"position":"外野手","name":"野村 工","kana":"ノムラ タクミ","age":27,"team":"鷺宮製作所","throws":"右","bats":"右","height":175,"weight":84,"highschool":"日本航空石川","university":"拓殖"},
+  {"position":"外野手","name":"浪川 広之","kana":"ナミカワ ヒロユキ","age":24,"team":"バイタルネット","throws":"右","bats":"左","height":173,"weight":87,"highschool":"創価","university":"城西国際"}
+]
