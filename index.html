@@ -109,7 +109,7 @@ padding:40px 0 60px;
 </div>
 <footer>© 2025 adjustment-lab</footer>
 <script>
-fetch("./assets/players.json")
+fetch("assets/players.json")
   .then(res => res.json())
   .then(players => {
     const groups = {
@@ -125,7 +125,8 @@ fetch("./assets/players.json")
       div.addEventListener("click",()=>showModal(p));
       if(groups[p.position]) groups[p.position].appendChild(div);
     });
-  });
+  })
+  .catch(err => console.error("JSON読み込みエラー:", err));
 
 const modal=document.getElementById("modal");
 const closeBtn=document.querySelector(".close");
