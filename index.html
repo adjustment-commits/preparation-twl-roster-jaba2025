@@ -7,41 +7,84 @@
 <meta name="theme-color" content="#007b9e">
 <style>
 :root {
-  --bg:#f8faf9; --text:#1a1a1a; --accent:#007b9e; --card:#fff;
+  --bg:#f8faf9;
+  --text:#1a1a1a;
+  --accent:#007b9e;
+  --card:#fff;
   --line:rgba(0,0,0,0.08);
   font-family:'Noto Sans JP',sans-serif;
 }
-body { margin:0; background:var(--bg); color:var(--text); line-height:1.8; }
-header { background:var(--accent); color:#fff; text-align:center; padding:16px; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+header {
+  background:var(--accent);
+  color:#fff;
+  text-align:center;
+  padding:16px;
+}
 h1 { margin:0; font-size:20px; }
-section { padding:20px; max-width:1000px; margin:auto; }
-h2 { border-left:4px solid var(--accent); padding-left:8px; margin-top:40px; }
-.roster { display:flex; flex-wrap:wrap; gap:10px; }
-.card { background:var(--card); border:1px solid var(--line); border-radius:8px;
-  padding:10px; width:calc(33.333% - 10px); cursor:pointer;
-  box-shadow:0 1px 3px rgba(0,0,0,0.05); transition:transform 0.15s ease; }
+section {
+  padding:20px;
+  max-width:1000px;
+  margin:auto;
+}
+h2 {
+  border-left:4px solid var(--accent);
+  padding-left:8px;
+  margin-top:40px;
+}
+.roster {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px;
+  width:calc(33.333% - 10px);
+  cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05);
+  transition:transform 0.15s ease;
+}
 .card:hover { transform:scale(1.03); }
 .card h3 { margin:0; font-size:16px; color:var(--accent); }
 .card p { margin:2px 0; font-size:13px; color:#333; }
 @media(max-width:700px){ .card{width:calc(50% - 10px);} }
 @media(max-width:480px){ .card{width:100%;} }
+
 .modal {
-  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.5); justify-content:center; align-items:center;
+display:none;
+position:fixed;
+top:0; left:0;
+width:100%; height:100%;
+background:rgba(0,0,0,0.5);
+justify-content:center;
+align-items:center;
 }
 .modal-content {
-  background:#fff; border-radius:10px; padding:20px;
-  width:90%; max-width:420px; max-height:90vh; overflow-y:auto;
+background:#fff;
+border-radius:10px;
+padding:20px;
+width:90%;
+max-width:420px;
+max-height:90vh;
+overflow-y:auto;
 }
 .modal-content h3 { color:var(--accent); margin-top:0; }
 .close { float:right; cursor:pointer; color:#999; }
-footer { text-align:center; font-size:13px; color:#666; padding:40px 0 60px; }
 .trends { background:#f7fbfd; border:1px solid rgba(0,0,0,0.06); padding:10px; border-radius:8px; }
 .trends p { margin:6px 0; }
-.badge { display:inline-block; padding:2px 6px; border-radius:6px; font-size:11px;
-  margin-right:6px; background:#eef7ff; border:1px solid #cfe7ff; }
-.note { font-size:12px; color:#666; margin-top:4px; }
+.badge { display:inline-block; padding:2px 6px; border-radius:6px; font-size:11px; margin-right:6px; background:#eef7ff; border:1px solid #cfe7ff; }
+footer { text-align:center; font-size:13px; color:#666; padding:40px 0 60px; }
 </style>
+
 </head>
 <body>
 <header><h1>TWL Roster 2025｜adjustment-lab</h1></header>
@@ -56,46 +99,71 @@ footer { text-align:center; font-size:13px; color:#666; padding:40px 0 60px; }
     <p id="modal-team"></p>
     <p id="modal-info"></p>
     <p id="modal-school"></p>
-    <canvas id="radarChart" width="300" height="300"></canvas>
-<hr>
-<h4>RPE／体調ログ</h4>
-<label>日付<input id="logDate" type="date"></label><br>
-<label>RPE<input id="logRpe" type="number" min="1" max="10"></label><br>
-<label>疲労（1〜5）<input id="logFatigue" type="number" min="1" max="5"></label><br>
-<label>睡眠（h）<input id="logSleep" type="number" step="0.5" min="0" max="12"></label><br>
-<label>痛み（0〜10）<input id="logPain" type="number" min="0" max="10"></label><br>
-<button id="saveLogBtn">記録を保存</button>
-<canvas id="rpeChart" width="300" height="180"></canvas>
-<hr>
-<h4>評価入力（フィジカル）</h4>
-<label>10m（s）<input id="s10" type="number" step="0.01"></label><br>
-<label>30m（s）<input id="s30" type="number" step="0.01"></label><br>
-<label>60m（s）<input id="s60" type="number" step="0.01"></label><br>
-<label>Agility（秒）<input id="agility" type="number" step="0.01"></label><br>
-<label>CMJ（cm）<input id="cmj" type="number"></label><br>
-<label>RSI<input id="rsi" type="number" step="0.01"></label><br>
-<hr>
-<h4 class="sec-blast">BLAST（野手）</h4>
-<label>スイング速度（km/h）<input id="swingSpeed" type="number"></label><br>
-<label>アタックアングル（°）<input id="attackAngle" type="number"></label><br>
-<label>スイングタイム（s）<input id="swingTime" type="number" step="0.01"></label><br>
-<hr>
-<h4 class="sec-rap-batter">Rapsodo（野手）</h4>
-<label>打球速度（km/h）<input id="exitVeloB" type="number"></label><br>
-<label>推定飛距離（m）<input id="estDistance" type="number"></label><br>
-<label>打球角度（°）<input id="launchAngleB" type="number"></label><br>
-<hr>
-<h4 class="sec-rap-pitcher">Rapsodo（投手）</h4>
-<label>球速（km/h）<input id="velo" type="number"></label><br>
-<label>回転数（rpm）<input id="spinRate" type="number"></label><br>
-<label>縦変化（cm）<input id="vertBreak" type="number"></label><br>
-<label>横変化（cm）<input id="horizBreak" type="number"></label><br>
-<label>リリース角度（°）<input id="releaseAngle" type="number"></label><br>
-<div id="evalResult"></div>
-<button id="deleteEvalBtn" style="background:#ff4d4d;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;margin-top:6px;">評価データを削除</button>
-</div></div>
+    <div id="trend-output"></div>
+  </div>
+</div>
 <footer>© 2025 adjustment-lab</footer>
-<script src="./logic-eval.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./logic-eval.js"></script>
+<script>
+fetch("./assets/players.json")
+  .then(res=>res.json())
+  .then(players=>{
+    const groups={
+      "投手":document.querySelector("#pitchers .roster"),
+      "捕手":document.querySelector("#catchers .roster"),
+      "内野手":document.querySelector("#infielders .roster"),
+      "外野手":document.querySelector("#outfielders .roster")
+    };
+    players.forEach(p=>{
+      const div=document.createElement("div");
+      div.className="card";
+      div.innerHTML=`<h3>${p.name}</h3><p>${p.team}</p><p>${p.age}歳／${p.height}cm ${p.weight}kg</p>`;
+      div.addEventListener("click",()=>showModal(p));
+      if(groups[p.position])groups[p.position].appendChild(div);
+    });
+  });
+const modal = document.getElementById("modal");
+const closeBtn = document.querySelector(".close");
+closeBtn.onclick = () => (modal.style.display = "none");
+
+function showModal(p) {
+  document.getElementById("modal-name").textContent = p.name;
+  document.getElementById("modal-team").textContent = `${p.team}｜${p.position}`;
+  document.getElementById("modal-info").textContent = `${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
+  document.getElementById("modal-school").textContent = `${p.highschool}${p.university ? " → " + p.university : ""}`;
+  const trendDiv = document.getElementById("trend-output");
+
+  const phys = getPhysicalTrends(p);
+  const hit = getHittingTrends(p);
+  const pitch = getPitchingTrends(p);
+  const all = [...phys, ...hit, ...pitch];
+  const summary = summarizeAdvantages(all);
+
+  trendDiv.innerHTML = `
+    <div class="trends">
+      <p class="badge">統合傾向</p>
+      ${all.map(t => `<p>・${t}</p>`).join("")}
+      <hr>
+      <p><strong>強み：</strong>${summary.positives.join("／")}</p>
+      <p><strong>課題：</strong>${summary.negatives.join("／")}</p>
+    </div>`;
+}
+    <div class="trends">
+    <p class="badge">フィジカル傾向</p>${phys.map(x=>`<p>・${x}</p>`).join("")}
+  </div>
+  <div class="trends">
+    <p class="badge">技術傾向</p>${hit.map(x=>`<p>・${x}</p>`).join("")}
+  </div>
+  <div class="trends">
+    <p class="badge">投球傾向</p>${pitch.map(x=>`<p>・${x}</p>`).join("")}
+  </div>
+  <div class="trends">
+    <p class="badge">強み</p>${summary.positives.map(x=>`<p>・${x}</p>`).join("")}
+    <p class="badge">課題</p>${summary.negatives.map(x=>`<p>・${x}</p>`).join("")}
+  </div>`;
+  modal.style.display="flex";
+}
+</script>
 </body>
 </html>
