@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OCR Reader｜adjustment-lab</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.2/dist/tesseract.min.js"></script>
+<style>
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #f8faf9;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+h1 { color: #007b9e; margin-bottom: 20px; }
+input[type=file] {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+textarea {
+  width: 95%;
+  height: 200px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: monospace;
+}
+button {
+  margin: 10px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #007b9e;
+  color: #fff;
+  cursor: pointer;
+}
+button:hover { opacity: 0.85; }
+#output { margin-top: 20px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>OCR Reader｜adjustment-lab</h1>
+<p>名簿画像を選択すると自動でOCR解析します。</p>
+<input type="file" id="fileInput" accept="image/*">
+<div id="status"></div>
+<textarea id="output" placeholder="ここにOCR結果が表示されます"></textarea>
+<br>
+<button id="downloadBtn">JSON形式でダウンロード</button>
+<script>
+const fileInput = document.getElementById('fileInput');
+const output = document.getElementById('output');
+const statusDiv = document.getElementById('status');
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  statusDiv.innerText = '解析中...少々お待ちください';
+  const { data: { text } } = await Tesseract.recognize(file, 'jpn', {
+    logger: info => { statusDiv.innerText = info.status + ' ' + Math.round(info.progress * 100) + '%'; }
+  });
+  output.value = text.trim();
+  statusDiv.innerText = 'OCR完了 ✅';
+});
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const lines = output.value.split('\n').map(l => l.trim()).filter(l => l);
+  const json = lines.map((line, i) => ({ no: i + 1, text: line }));
+  const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'players.json';
+  link.click();
+});
+</script>
+</body>
+</html>
