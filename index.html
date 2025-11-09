@@ -109,8 +109,7 @@ padding:40px 0 60px;
 </div>
 <footer>© 2025 adjustment-lab</footer>
 <script>
-fetch("assets/players.json")
-  .then(res => res.json())
+fetch("./preparation-twl-roster-jaba2025/assets/players.json")  .then(res => res.json())
   .then(players => {
     const groups = {
       "投手": document.querySelector("#pitchers .roster"),
