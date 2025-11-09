@@ -5,32 +5,47 @@ adjustment-lab｜VO₂max Lite｜統合評価ロジック ver.2025.11-EXT
 function cooperToVO2max(dist){ return (dist - 504.9) / 44.73; }
 function yoyoToVO2max(dist){ return dist * 0.0084 + 36.4; }
 
-function calcSprintScore(s10, s30, s60){
+function calcSprintScore(s10, s30, s60) {
   let score = 0;
-  if(!isNaN(s10)){ if(s10 <= 1.45) score += 2; else if(s10 <= 1.50) score += 1; }
-  if(!isNaN(s30)){ if(s30 <= 3.75) score += 2; else if(s30 <= 3.85) score += 1; }
-  if(!isNaN(s60)){ if(s60 <= 7.00) score += 2; else if(s60 <= 7.20) score += 1; }
-  return score;
+  if (!isNaN(s10)) {
+    if (s10 <= 1.45) score += 3;
+    else if (s10 <= 1.50) score += 2;
+    else if (s10 <= 1.60) score += 1;
+  }
+  if (!isNaN(s30)) {
+    if (s30 <= 3.75) score += 3;
+    else if (s30 <= 3.85) score += 2;
+    else if (s30 <= 3.95) score += 1;
+  }
+  if (!isNaN(s60)) {
+    if (s60 <= 6.90) score += 3;
+    else if (s60 <= 7.10) score += 2;
+    else if (s60 <= 7.30) score += 1;
+  }
+  return Math.min(3, Math.round(score / 3)); // 合計平均化で3点上限
 }
 
-function calcCMJScore(cmj){
-  if(isNaN(cmj)) return 0;
-  if(cmj >= 70) return 2;
-  if(cmj >= 65) return 1;
+function calcCMJScore(cmj) {
+  if (isNaN(cmj)) return 0;
+  if (cmj >= 70) return 3;
+  if (cmj >= 60) return 2;
+  if (cmj >= 50) return 1;
   return 0;
 }
 
-function calcRSIScore(rsi){
-  if(isNaN(rsi)) return 0;
-  if(rsi >= 3.00) return 2;
-  if(rsi >= 2.50) return 1;
+function calcRSIScore(rsi) {
+  if (isNaN(rsi)) return 0;
+  if (rsi >= 3.0) return 3;
+  if (rsi >= 2.5) return 2;
+  if (rsi >= 2.0) return 1;
   return 0;
 }
 
-function calcAgilityScore(agility){
-  if(isNaN(agility)) return 0;
-  if(agility <= 4.20) return 2;
-  if(agility <= 4.40) return 1;
+function calcAgilityScore(agility) {
+  if (isNaN(agility)) return 0;
+  if (agility <= 4.20) return 3;
+  if (agility <= 4.35) return 2;
+  if (agility <= 4.50) return 1;
   return 0;
 }
 
