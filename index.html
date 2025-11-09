@@ -108,6 +108,7 @@ input,button { font-size:14px; margin:4px 0; padding:4px; width:100%; box-sizing
 <label>睡眠（h）<input id="logSleep" type="number" step="0.5" min="0" max="12"></label>
 <label>痛み（0〜10）<input id="logPain" type="number" min="0" max="10"></label>
 <button id="saveLogBtn">記録を保存</button>
+<button id="clearLogBtn" style="background:#ccc;">ログを削除</button>
 <canvas id="rpeChart" width="300" height="180"></canvas>
 
 <hr>
@@ -172,7 +173,8 @@ function showModal(p){
     <label>縦変化<input id="vertBreak" type="number"></label>
     <label>横変化<input id="horizBreak" type="number"></label>
     <label>リリース角<input id="releaseAngle" type="number"></label>
-    <button onclick="analyze(p,'pitcher')">傾向分析</button>`;
+    <button onclick="analyze(p,'pitcher')">傾向分析</button>
+　　<button onclick="clearInputs()">入力をリセット</button>`;
   }else{
     zone.innerHTML=`
     <h4>共通フィジカル計測</h4>
@@ -187,7 +189,264 @@ function showModal(p){
     <label>打球速度<input id="exitVeloB" type="number"></label>
     <label>打球角度<input id="launchAngleB" type="number"></label>
     <label>推定飛距離<input id="estDistance" type="number"></label>
-    <button onclick="analyze(p,'batter')">傾向分析</button>`;
+    <button onclick="analyze(p,'batter')">傾向分析</button>
+    <button onclick="clearInputs()">入力をリセット</button>`;
+  }
+  trendDiv.innerHTML="";
+  modal.style.display="flex";
+}
+
+function analyze(p,mode){
+  const vals={
+    s10:parseFloat(document.getElementById("s10").value),
+    cmj:parseFloat(document.getElementById("cmj").value),
+    rsi:parseFloat(document.getElementById("rsi").value),
+    agility:parseFloat(document.getElementById("agility").value)
+  };
+  const phys=getPhysicalTrends(vals);
+  let tech=[],summary;
+  if(mode==="pitcher"){
+    Object.assign(vals,{
+      velo:parseFloat(document.getElementById("velo").value),
+      spinRate:parseFloat(document.getElementById("spinRate").value),
+      vertBreak:parseFloat(document.getElementById("vertBreak").value),
+      horizBreak:parseFloat(document.getElementById("horizBreak").value),
+      releaseAngle:parseFloat(document.getElementById("releaseAngle").value)
+    });
+    tech=getPitchingTrends(vals);
+  }else{
+    Object.assign(vals,{
+      swingSpeed:parseFloat(document.getElementById("swingSpeed").value),
+      attackAngle:parseFloat(document.getElementById("attackAngle").value),
+      swingTime:parseFloat(document.getElementById("swingTime").value),
+      exitVeloB:parseFloat(document.getElementById("exitVeloB").value),
+      estDistance:parseFloat(document.getElementById("estDistance").value),
+      launchAngleB:parseFloat(document.getElementById("launchAngleB").value)
+    });
+    tech=getHittingTrends(vals);
+  }
+  const all=[...phys,...tech];
+  summary=summarizeAdvantages(all);
+  document.getElementById("trend-output").innerHTML=`
+  <div class="trends"><p class="badge">フィジカル傾向</p>${phys.map(x=>`<p>・${x}</p>`).join("")}</div>
+  <div class="trends"><p class="badge">技術傾向</p>${tech.map(x=>`<p>・${x}</p>`).join("")}</div>
+  <div class="trends"><p class="badge">統合傾向</p>${all.map(x=>`<p>・${x}</p>`).join("")}
+  <hr><p><strong>強み：</strong>${summary.positives.join("／")}</p>
+  <p><strong>課題：</strong>${summary.negatives.join("／")}</p></div>`;
+}
+document.getElementById("clearLogBtn").addEventListener("click",()=>{
+  if(confirm("RPEログをすべて削除しますか？")){
+    rpeData.labels=[];
+    rpeData.datasets[0].data=[];
+    chart.update();
+  }
+});
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TWL Roster 2025｜adjustment-lab</title>
+<meta name="theme-color" content="#007b9e">
+<style>
+:root {
+  --bg:#f8faf9;
+  --text:#1a1a1a;
+  --accent:#007b9e;
+  --card:#fff;
+  --line:rgba(0,0,0,0.08);
+  font-family:'Noto Sans JP',sans-serif;
+}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+header {
+  background:var(--accent);
+  color:#fff;
+  text-align:center;
+  padding:16px;
+}
+h1 { margin:0; font-size:20px; }
+section {
+  padding:20px;
+  max-width:1000px;
+  margin:auto;
+}
+h2 {
+  border-left:4px solid var(--accent);
+  padding-left:8px;
+  margin-top:40px;
+}
+.roster {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px;
+  width:calc(33.333% - 10px);
+  cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05);
+  transition:transform 0.15s ease;
+}
+.card:hover { transform:scale(1.03); }
+.card h3 { margin:0; font-size:16px; color:var(--accent); }
+.card p { margin:2px 0; font-size:13px; color:#333; }
+@media(max-width:700px){ .card{width:calc(50% - 10px);} }
+@media(max-width:480px){ .card{width:100%;} }
+.modal {
+display:none;
+position:fixed;
+top:0; left:0;
+width:100%; height:100%;
+background:rgba(0,0,0,0.5);
+justify-content:center;
+align-items:center;
+}
+.modal-content {
+background:#fff;
+border-radius:10px;
+padding:20px;
+width:90%;
+max-width:420px;
+max-height:90vh;
+overflow-y:auto;
+}
+.modal-content h3 { color:var(--accent); margin-top:0; }
+.close { float:right; cursor:pointer; color:#999; }
+.trends { background:#f7fbfd; border:1px solid rgba(0,0,0,0.06); padding:10px; border-radius:8px; }
+.trends p { margin:6px 0; }
+.badge { display:inline-block; padding:2px 6px; border-radius:6px; font-size:11px; margin-right:6px; background:#eef7ff; border:1px solid #cfe7ff; }
+footer { text-align:center; font-size:13px; color:#666; padding:40px 0 60px; }
+input,button { font-size:14px; margin:4px 0; padding:4px; width:100%; box-sizing:border-box; }
+</style>
+</head>
+<body>
+<header><h1>TWL Roster 2025｜adjustment-lab</h1></header>
+<!-- ==== 各ポジション一覧 ==== -->
+<section id="pitchers"><h2>投手</h2><div class="roster"></div></section>
+<section id="catchers"><h2>捕手</h2><div class="roster"></div></section>
+<section id="infielders"><h2>内野手</h2><div class="roster"></div></section>
+<section id="outfielders"><h2>外野手</h2><div class="roster"></div></section>
+<!-- ==== モーダル ==== -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close">✕</span>
+    <h3 id="modal-name"></h3>
+    <p id="modal-team"></p>
+    <p id="modal-info"></p>
+    <p id="modal-school"></p>
+<hr>
+<h4>RPE／体調ログ</h4>
+<label>日付<input id="logDate" type="date"></label>
+<label>RPE（主観的運動強度）<input id="logRpe" type="number" min="1" max="10"></label>
+<label>疲労（1〜5）<input id="logFatigue" type="number" min="1" max="5"></label>
+<label>睡眠（h）<input id="logSleep" type="number" step="0.5" min="0" max="12"></label>
+<label>痛み（0〜10）<input id="logPain" type="number" min="0" max="10"></label>
+<button id="saveLogBtn">記録を保存</button>
+<button id="clearLogBtn" style="background:#ccc;">ログを削除</button>
+<canvas id="rpeChart" width="300" height="180"></canvas>
+
+<hr>
+<div id="input-zone"></div>
+<div id="trend-output"></div>  </div>
+</div>
+<footer>© 2025 adjustment-lab</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./logic-eval.js"></script>
+<script>
+fetch("./assets/players.json")
+  .then(res=>res.json())
+  .then(players=>{
+    const groups={
+      "投手":document.querySelector("#pitchers .roster"),
+      "捕手":document.querySelector("#catchers .roster"),
+      "内野手":document.querySelector("#infielders .roster"),
+      "外野手":document.querySelector("#outfielders .roster")
+    };
+    players.forEach(p=>{
+      const div=document.createElement("div");
+      div.className="card";
+      div.innerHTML=`<h3>${p.name}</h3><p>${p.team}</p><p>${p.age}歳／${p.height}cm ${p.weight}kg</p>`;
+      div.addEventListener("click",()=>showModal(p));
+      if(groups[p.position])groups[p.position].appendChild(div);
+    });
+  });
+
+const modal=document.getElementById("modal");
+const closeBtn=document.querySelector(".close");
+closeBtn.onclick=()=>modal.style.display="none";
+
+// ==== RPEログ ====
+const ctx=document.getElementById("rpeChart").getContext("2d");
+const rpeData={labels:[],datasets:[{label:"RPE",data:[],borderColor:"#007b9e",fill:false}]};
+const chart=new Chart(ctx,{type:"line",data:rpeData,options:{scales:{y:{min:0,max:10}}}});
+document.getElementById("saveLogBtn").addEventListener("click",()=>{
+  const d=document.getElementById("logDate").value;
+  const r=Number(document.getElementById("logRpe").value);
+  if(d&&r){rpeData.labels.push(d);rpeData.datasets[0].data.push(r);chart.update();}
+});
+
+document.getElementById("clearLogBtn").addEventListener("click",()=>{
+  if(confirm("RPEログをすべて削除しますか？")){
+    rpeData.labels=[];
+    rpeData.datasets[0].data=[];
+    chart.update();
+  }
+});
+
+// ==== フィジカル・打撃・投球入力をクリア ====
+function clearInputs(){
+  document.querySelectorAll('#input-zone input').forEach(el=>el.value="");
+}
+
+function showModal(p){
+  document.getElementById("modal-name").textContent=p.name;
+  document.getElementById("modal-team").textContent=`${p.team}｜${p.position}`;
+  document.getElementById("modal-info").textContent=`${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
+  document.getElementById("modal-school").textContent=`${p.highschool}${p.university?" → "+p.university:""}`;
+  const zone=document.getElementById("input-zone");
+  const trendDiv=document.getElementById("trend-output");
+
+  // === ポジション別計測項目 ===
+  if(p.position==="投手"){
+    zone.innerHTML=`
+    <h4>共通フィジカル計測</h4>
+    <label>10mスプリント<input id="s10" type="number" step="0.01"></label>
+    <label>CMJ<input id="cmj" type="number" step="0.1"></label>
+    <label>RSI<input id="rsi" type="number" step="0.1"></label>
+    <label>Agility<input id="agility" type="number" step="0.01"></label>
+    <h4>投球計測（Rapsodo）</h4>
+    <label>球速<input id="velo" type="number"></label>
+    <label>回転数<input id="spinRate" type="number"></label>
+    <label>縦変化<input id="vertBreak" type="number"></label>
+    <label>横変化<input id="horizBreak" type="number"></label>
+    <label>リリース角<input id="releaseAngle" type="number"></label>
+    <button onclick="analyze(p,'pitcher')">傾向分析</button>
+    <button onclick="clearInputs()" style="background:#ccc;">入力をリセット</button>`;
+  }else{
+    zone.innerHTML=`
+    <h4>共通フィジカル計測</h4>
+    <label>10mスプリント<input id="s10" type="number" step="0.01"></label>
+    <label>CMJ<input id="cmj" type="number" step="0.1"></label>
+    <label>RSI<input id="rsi" type="number" step="0.1"></label>
+    <label>Agility<input id="agility" type="number" step="0.01"></label>
+    <h4>打撃計測（BLAST + Rapsodo）</h4>
+    <label>スイング速度<input id="swingSpeed" type="number"></label>
+    <label>アタックアングル<input id="attackAngle" type="number"></label>
+    <label>スイング時間<input id="swingTime" type="number" step="0.01"></label>
+    <label>打球速度<input id="exitVeloB" type="number"></label>
+    <label>打球角度<input id="launchAngleB" type="number"></label>
+    <label>推定飛距離<input id="estDistance" type="number"></label>
+    <button onclick="analyze(p,'batter')">傾向分析</button>
+    <button onclick="clearInputs()" style="background:#ccc;">入力をリセット</button>`;
   }
   trendDiv.innerHTML="";
   modal.style.display="flex";
