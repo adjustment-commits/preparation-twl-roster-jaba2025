@@ -184,6 +184,19 @@ function showModal(p) {
   document.getElementById("modal-info").textContent = `${p.age}歳／${p.throws}投${p.bats}打／${p.height}cm ${p.weight}kg`;
   document.getElementById("modal-school").textContent = `${p.highschool}${p.university ? " → " + p.university : ""}`;
   modal.style.display = "flex";
+
+ const blastSection = Array.from(document.querySelectorAll('h4'))
+  .find(h => h.textContent.includes('BLAST'))?.parentElement;
+const rapsodoSection = Array.from(document.querySelectorAll('h4'))
+  .find(h => h.textContent.includes('Rapsodo'))?.parentElement;
+
+if (p.position === "投手") {
+  if (blastSection) blastSection.style.display = "none";
+  if (rapsodoSection) rapsodoSection.style.display = "block";
+} else {
+  if (blastSection) blastSection.style.display = "block";
+  if (rapsodoSection) rapsodoSection.style.display = "none";
+}
   evalResult.textContent = "";
 }
 
